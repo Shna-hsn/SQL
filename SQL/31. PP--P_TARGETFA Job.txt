@@ -1,0 +1,8 @@
+begin
+  sys.dbms_job.submit(job => :job,
+                      what => 'P_TARGETFA;',
+                      next_date => to_date('29-06-2019 11:05:00', 'dd-mm-yyyy hh24:mi:ss'),
+                      interval => 'SYSDATE+10/1440');
+  commit;
+end;
+/

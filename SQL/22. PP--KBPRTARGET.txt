@@ -1,0 +1,39 @@
+-- Create table
+create table KBPRTARGET
+(
+  mfgtype VARCHAR2(10 BYTE) not null,
+  line    VARCHAR2(60 BYTE) not null,
+  shift   VARCHAR2(10 BYTE) not null,
+  side    VARCHAR2(10 BYTE) default 'A' not null,
+  target  NUMBER default 0 not null,
+  userid  VARCHAR2(50 BYTE),
+  trndate DATE default SYSDATE
+)
+tablespace SFCPP139D
+  pctfree 10
+  initrans 1
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
+-- Create/Recreate primary, unique and foreign key constraints 
+alter table KBPRTARGET
+  add constraint KBPRTARGET_PK primary key (MFGTYPE, LINE, SHIFT, SIDE)
+  using index 
+  tablespace SFCPP139D
+  pctfree 10
+  initrans 2
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
+-- Grant/Revoke object privileges 
+grant select, insert, update, delete on KBPRTARGET to public;

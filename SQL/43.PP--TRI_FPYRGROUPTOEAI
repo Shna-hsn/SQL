@@ -1,0 +1,60 @@
+CREATE OR REPLACE TRIGGER TRI_FPYRGROUPTOEAI
+AFTER INSERT OR UPDATE OR DELETE ON SFCPP139.FPYRGROUPING    
+REFERENCING OLD AS OLD NEW AS NEW
+   FOR EACH ROW
+DECLARE
+    V_COUNT NUMBER :=0; 
+    VAR_ERR_MSG VARCHAR2 (2000);
+/******************************************************************************
+   NAME:       TRI_FPYRGROUPTOEAI
+   PURPOSE:    
+
+   REVISIONS:
+   Ver        Date        Author           Description
+   ---------  ----------  ---------------  ------------------------------------
+   1.0        2015/4/23      k1312c69       1. Created this trigger.
+
+   NOTES:
+
+   Automatically available Auto Replace Keywords:
+      Object Name:     TRI_FPYRGROUPTOEAI
+      Sysdate:         2015/4/23
+      Date and Time:   2015/4/23, 19:30:00, and 2015/4/23 19:30:00
+      Username:        k1312c69 (set in TOAD Options, Proc Templates)
+      Table Name:      FPYRGROUPING (set in the "New PL/SQL Object" dialog)
+      Trigger Options:  (set in the "New PL/SQL Object" dialog)
+******************************************************************************/
+BEGIN
+  IF INSERTING THEN
+      SELECT COUNT(*) INTO V_COUNT FROM TIBCOEAI.FPYRSITEGROUPING WHERE PLANT =:NEW.PLANT AND MFGTYPE = :NEW.MFGTYPE  AND STAGEGROUP = :NEW.STAGEGROUP ;
+         IF V_COUNT <=0 THEN
+          INSERT INTO TIBCOEAI.FPYRSITEGROUPING
+            (PLANT,MFGTYPE,STAGEGROUP)
+             VALUES(:NEW.PLANT,:NEW.MFGTYPE,:NEW.STAGEGROUP);
+        END IF;
+   END IF;
+   IF UPDATING THEN
+     SELECT COUNT(*) INTO V_COUNT FROM TIBCOEAI.FPYRSITEGROUPING WHERE PLANT =:OLD.PLANT AND MFGTYPE = :OLD.MFGTYPE  AND STAGEGROUP = :OLD.STAGEGROUP;
+        IF V_COUNT <=0 THEN
+          INSERT INTO TIBCOEAI.FPYRSITEGROUPING
+            (PLANT,MFGTYPE,STAGEGROUP)
+             VALUES(:OLD.PLANT,:OLD.MFGTYPE,:OLD.STAGEGROUP);
+         END IF;
+           UPDATE TIBCOEAI.FPYRSITEGROUPING
+           SET PLANT=:NEW.PLANT,MFGTYPE=:NEW.MFGTYPE,STAGEGROUP=:NEW.STAGEGROUP
+            WHERE PLANT =:OLD.PLANT AND MFGTYPE = :OLD.MFGTYPE  AND STAGEGROUP = :OLD.STAGEGROUP;
+       
+   END IF;
+      --DELETE
+   IF DELETING THEN
+       DELETE FROM TIBCOEAI.FPYRSITEGROUPING WHERE PLANT =:OLD.PLANT AND MFGTYPE = :OLD.MFGTYPE  AND STAGEGROUP = :OLD.STAGEGROUP;
+   END IF; 
+
+   EXCEPTION
+     WHEN OTHERS THEN
+       -- Consider logging the error and then re-raise
+        VAR_ERR_MSG := SQLERRM (SQLCODE);
+   INSERT INTO KBNERRORLOG
+   VALUES (SYSDATE, 'TRI_FPYRGROUPTOEAI', VAR_ERR_MSG);
+   
+END TRI_FPYRGROUPTOEAI;

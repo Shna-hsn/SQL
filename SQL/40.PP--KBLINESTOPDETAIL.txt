@@ -1,0 +1,99 @@
+-- Create table
+create table KBLINESTOPDETAIL
+(
+  sequenceid    VARCHAR2(50) not null,
+  symption      VARCHAR2(800),
+  dutydept      VARCHAR2(80),
+  dutyleader    VARCHAR2(120),
+  applydatetime DATE,
+  downtimefrom  DATE,
+  isshutdown    CHAR(1),
+  downtimeto    DATE,
+  replaytime    DATE,
+  status        VARCHAR2(50),
+  line          VARCHAR2(20)
+)
+tablespace SFCPP139D
+  pctfree 10
+  initrans 1
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
+-- Add comments to the columns 
+comment on column KBLINESTOPDETAIL.sequenceid
+  is '停線單號';
+comment on column KBLINESTOPDETAIL.symption
+  is '描述';
+comment on column KBLINESTOPDETAIL.dutydept
+  is '責任單位';
+comment on column KBLINESTOPDETAIL.dutyleader
+  is '責任人';
+comment on column KBLINESTOPDETAIL.applydatetime
+  is '填單時間';
+comment on column KBLINESTOPDETAIL.downtimefrom
+  is '停線開始時間';
+comment on column KBLINESTOPDETAIL.isshutdown
+  is '是否停線,Y is stop, N is not stop';
+comment on column KBLINESTOPDETAIL.downtimeto
+  is '停線結束時間';
+comment on column KBLINESTOPDETAIL.replaytime
+  is '確認複線時間';
+comment on column KBLINESTOPDETAIL.status
+  is '表單狀態;O:表單開始，C:停線表單完成，R:被駁回表單';
+-- Create/Recreate primary, unique and foreign key constraints 
+alter table KBLINESTOPDETAIL
+  add primary key (SEQUENCEID)
+  using index 
+  tablespace SFCPP139D
+  pctfree 10
+  initrans 2
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
+-- Create/Recreate indexes 
+create index IDX_KBLINESTOPDETAIL_01 on KBLINESTOPDETAIL (DOWNTIMEFROM)
+  tablespace SFCPP139D
+  pctfree 10
+  initrans 2
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
+create index IDX_KBLINESTOPDETAIL_02 on KBLINESTOPDETAIL (DOWNTIMEFROM, DOWNTIMETO)
+  tablespace SFCPP139D
+  pctfree 10
+  initrans 2
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
+create index IDX_KBLINESTOPDETAIL_03 on KBLINESTOPDETAIL (LINE, DOWNTIMEFROM)
+  tablespace SFCPP139D
+  pctfree 10
+  initrans 2
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );

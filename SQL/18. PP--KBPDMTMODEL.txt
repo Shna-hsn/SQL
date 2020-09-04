@@ -1,0 +1,22 @@
+-- Create table
+create table KBPDMTMODEL
+(
+  mfgtype       VARCHAR2(10 BYTE) not null,
+  line          VARCHAR2(60 BYTE) not null,
+  modelfamily   VARCHAR2(50 BYTE) not null,
+  modelname     VARCHAR2(30 BYTE) not null,
+  userid        VARCHAR2(50 BYTE),
+  trndate       DATE not null,
+  materialgroup VARCHAR2(10)
+)
+tablespace SFCPP139D
+  pctfree 10
+  initrans 1
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );

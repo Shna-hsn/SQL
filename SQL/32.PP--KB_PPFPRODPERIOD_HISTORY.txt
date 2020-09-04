@@ -1,0 +1,50 @@
+create table KB_PPFPRODPERIOD_HISTORY
+(
+  dateid     VARCHAR2(10) not null,
+  process    NUMBER(1) not null,
+  line       VARCHAR2(10 BYTE) not null,
+  shift      NUMBER(1) not null,
+  periodno   NUMBER(3) not null,
+  perioddate DATE,
+  starttime  DATE,
+  endtime    DATE,
+  breaktime  VARCHAR2(5 BYTE),
+  userid     VARCHAR2(50 BYTE),
+  trndate    DATE default SYSDATE not null,
+  intarget   NUMBER default 0,
+  outtarget  NUMBER default 0,
+  inactual   NUMBER default 0,
+  outactual  NUMBER default 0,
+  updatetime DATE default sysdate,
+  remark     VARCHAR2(500),
+  infpyr     NUMBER(13,4) default 1,
+  outfpyr    NUMBER(13,4) default 1,
+  createtime DATE default sysdate,
+  fpyr       NUMBER(13,4) default 1 not null
+)
+tablespace SFCPP139D
+  pctfree 10
+  initrans 1
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
+-- Create/Recreate primary, unique and foreign key constraints 
+alter table KB_PPFPRODPERIOD_HISTORY
+  add constraint KB_PPFPRODPERIOD_HISTORY_PK primary key (DATEID, LINE, PROCESS, SHIFT, PERIODNO)
+  using index 
+  tablespace SFCPP230D
+  pctfree 10
+  initrans 2
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );

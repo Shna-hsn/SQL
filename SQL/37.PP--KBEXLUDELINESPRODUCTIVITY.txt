@@ -1,0 +1,28 @@
+create table KBEXLUDELINESPRODUCTIVITY
+(
+  mfgtype VARCHAR2(3 BYTE) not null,
+  line    VARCHAR2(5 BYTE) not null,
+  status  VARCHAR2(2 BYTE) default '1'
+)
+tablespace SFCPP139D
+  pctfree 10
+  initrans 1
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
+-- Add comments to the table 
+comment on table KBEXLUDELINESPRODUCTIVITY
+  is '計算Total產能時,排除這些線別的target,actual,gap';
+-- Add comments to the columns 
+comment on column KBEXLUDELINESPRODUCTIVITY.status
+  is '設定是否有效,1有效,0無效';
+-- Create/Recreate check constraints 
+alter table KBEXLUDELINESPRODUCTIVITY
+  add check (mfgtype='FA' or mfgtype='PCB');
+alter table KBEXLUDELINESPRODUCTIVITY
+  add check (status='1' or status = '0'); 

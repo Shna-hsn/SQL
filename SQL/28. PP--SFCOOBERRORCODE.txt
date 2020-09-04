@@ -1,0 +1,20 @@
+-- Create table
+create table SFCOOBERRORCODE
+(
+  mfgtype   VARCHAR2(3 BYTE) not null,
+  errorcode VARCHAR2(10 BYTE) not null,
+  errortype NUMBER(1) default 0
+)
+tablespace SFCPP139D
+  pctfree 10
+  initrans 1
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
+-- Grant/Revoke object privileges 
+grant select on SFCOOBERRORCODE to public;

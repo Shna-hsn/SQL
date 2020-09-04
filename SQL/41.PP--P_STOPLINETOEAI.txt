@@ -1,0 +1,110 @@
+﻿CREATE OR REPLACE PROCEDURE P_STOPLINETOEAI IS
+  V_PLANT      VARCHAR2(50 CHAR) := 'P8-F139';
+  V_MFGTYPE    VARCHAR2(3 CHAR);
+  V_ISOFFLINE  VARCHAR2(1 CHAR);
+  V_LINES      KBLINESTOPDETAIL.LINE%TYPE;
+  V_LINE       KBLINESTOPDETAIL.LINE%TYPE;
+  V_NUM        NUMBER;
+  VAR_ERR_MSG  VARCHAR(2000);
+  V_PCBLINEQTY NUMBER;
+  V_FALINEQTY  NUMBER;
+
+
+  CURSOR C_STOPLINE IS
+    SELECT *
+      FROM KBLINESTOPDETAIL
+     WHERE (STATUS = 'C' AND DOWNTIMEFROM > SYSDATE - 1)
+        OR DOWNTIMEFROM > TRUNC(SYSDATE);
+
+BEGIN
+  DELETE FROM TIBCOEAI.KBLINESTOPSHOW WHERE PLANT = V_PLANT;
+
+  IF V_PLANT = 'P8-F139' THEN
+    FOR C_ROW IN C_STOPLINE LOOP
+      V_LINES := C_ROW.LINE;
+
+      FOR C_LINEROW IN (SELECT *
+                          FROM TABLE(CAST(FUN_STR_SPLIT(V_LINES, ',') AS
+                                          TY_STR_SPLIT))) LOOP
+        V_LINE := C_LINEROW.COLUMN_VALUE;
+
+        IF SUBSTR(V_LINE, 6, 2) = 'FT' THEN
+          V_MFGTYPE := 'FA';
+
+          SELECT COUNT(*) INTO V_NUM FROM SFCLINE_MAP WHERE LINE = V_LINE;
+
+          IF V_NUM > 0 THEN
+            V_ISOFFLINE := 'N';
+          ELSE
+            V_ISOFFLINE := 'Y';
+          END IF;
+          V_PCBLINEQTY := 0;
+          V_FALINEQTY  := 0;
+          SELECT COUNT(*)
+            INTO V_PCBLINEQTY
+            FROM LINEKBDETAIL
+           WHERE (INACTURL > 0 OR OUTACTURL > 0)
+             AND LINE IN (SELECT LINE
+                            FROM SFCLINE_MAP
+                           WHERE INSTR(SMTLINES, V_LINE) > 0);
+
+          SELECT COUNT(*)
+            INTO V_FALINEQTY
+            FROM LINEKBDETAIL
+           WHERE (INACTURL > 0 OR OUTACTURL > 0)
+             AND LINE = V_LINE;
+          IF V_PCBLINEQTY > 0 OR V_FALINEQTY > 0 THEN
+            INSERT INTO TIBCOEAI.KBLINESTOPSHOW
+              (PLANT,
+               MFGTYPE,
+               SEQUENCEID,
+               SYMPTION,
+               DUTYDEPT,
+               DUTYLEADER,
+               APPLYDATETIME,
+               DOWNTIMEFROM,
+               ISSHUTDOWN,
+               DOWNTIMETO,
+               REPLAYTIME,
+               STATUS,
+               LINE,
+               ISOFFLINE)
+            VALUES
+              (V_PLANT,
+               V_MFGTYPE,
+               C_ROW.SEQUENCEID,
+               C_ROW.SYMPTION,
+               C_ROW.DUTYDEPT,
+               C_ROW.DUTYLEADER,
+               C_ROW.APPLYDATETIME,
+               C_ROW.DOWNTIMEFROM,
+               C_ROW.ISSHUTDOWN,
+               C_ROW.DOWNTIMETO,
+               C_ROW.REPLAYTIME,
+               C_ROW.STATUS,
+               V_LINE,
+               V_ISOFFLINE);
+
+          END IF;
+        END IF;
+      END LOOP;
+     END LOOP;
+
+     COMMIT;
+   END IF;
+
+EXCEPTION
+  WHEN NO_DATA_FOUND THEN
+    NULL;
+  WHEN OTHERS THEN
+    -- Consider logging the error and then re-raise
+    ROLLBACK;
+    VAR_ERR_MSG := SQLERRM(SQLCODE);
+
+    INSERT INTO KBNERRORLOG
+    VALUES
+      (SYSDATE, 'P_STOPLINETOEAI', VAR_ERR_MSG);
+
+    COMMIT;
+    RAISE;
+END P_STOPLINETOEAI;

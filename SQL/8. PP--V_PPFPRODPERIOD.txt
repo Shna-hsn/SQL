@@ -1,0 +1,122 @@
+CREATE OR REPLACE VIEW V_PPFPRODPERIOD AS
+SELECT process, line, shift, periodno,
+          CASE
+             WHEN shift = 1
+                THEN CASE
+                       WHEN TO_DATE (   TO_CHAR (SYSDATE, 'YYYYMMDD')
+                                     || starttime
+                                     /*|| ':00'*/,
+                                     'YYYYMMDDHH24:mi:ss'
+                                    ) >
+                              TO_DATE (   TO_CHAR (SYSDATE, 'YYYYMMDD')
+                                       || endtime
+                                       /*|| ':00'*/,
+                                       'YYYYMMDDHH24:mi:ss'
+                                      )
+                       AND TO_DATE (   TO_CHAR (SYSDATE, 'YYYYMMDD')
+                                    || starttime
+                                    /*|| ':00'*/,
+                                    'YYYYMMDDHH24:mi:ss'
+                                   ) > SYSDATE
+                       AND TO_CHAR (SYSDATE, 'HH24') < '12'
+                          THEN TO_DATE (   TO_CHAR (SYSDATE - 1, 'YYYYMMDD')
+                                        || starttime
+                                        /*|| ':00'*/,
+                                        'YYYYMMDDHH24:mi:ss'
+                                       )
+                       WHEN TO_CHAR (SYSDATE, 'HH24') >= '12'
+                       AND SUBSTR (starttime, 1, 2) < '12'
+                          THEN TO_DATE (   TO_CHAR (SYSDATE + 1, 'YYYYMMDD')
+                                        || starttime
+                                        /*|| ':00'*/,
+                                        'YYYYMMDDHH24:mi:ss'
+                                       )
+                       WHEN TO_DATE (   TO_CHAR (SYSDATE, 'YYYYMMDD')
+                                     || starttime
+                                     /*|| ':00'*/,
+                                     'YYYYMMDDHH24:mi:ss'
+                                    ) <
+                              TO_DATE (   TO_CHAR (SYSDATE, 'YYYYMMDD')
+                                       || endtime
+                                       /*|| ':00'*/,
+                                       'YYYYMMDDHH24:mi:ss'
+                                      )
+                       AND TO_CHAR (SUBSTR (starttime, 1, 2)) > '12'
+                       AND TO_CHAR (SYSDATE, 'HH24') < '12'
+                          THEN TO_DATE (   TO_CHAR (SYSDATE - 1, 'YYYYMMDD')
+                                        || starttime
+                                        /*|| ':00'*/,
+                                        'YYYYMMDDHH24:mi:ss'
+                                       )
+                       ELSE TO_DATE (   TO_CHAR (SYSDATE, 'YYYYMMDD')
+                                     || starttime
+                                     /*|| ':00'*/,
+                                     'YYYYMMDDHH24:mi:ss'
+                                    )
+                    END
+             ELSE TO_DATE (TO_CHAR (SYSDATE, 'YYYYMMDD') || starttime /*|| ':00'*/,
+                           'YYYYMMDDHH24:mi:ss'
+                          )
+          END AS starttime,
+
+          --ENDTIME
+          CASE
+             WHEN shift = 1
+                THEN CASE
+                       WHEN TO_DATE (   TO_CHAR (SYSDATE, 'YYYYMMDD')
+                                     || starttime
+                                     /*|| ':00'*/,
+                                     'YYYYMMDDHH24:mi:ss'
+                                    ) >
+                              TO_DATE (   TO_CHAR (SYSDATE, 'YYYYMMDD')
+                                       || endtime
+                                       /*|| ':00'*/,
+                                       'YYYYMMDDHH24:mi:ss'
+                                      )
+                       AND TO_DATE (   TO_CHAR (SYSDATE, 'YYYYMMDD')
+                                    || starttime
+                                    /*|| ':00'*/,
+                                    'YYYYMMDDHH24:mi:ss'
+                                   ) < SYSDATE
+                          THEN TO_DATE (   TO_CHAR (SYSDATE + 1, 'YYYYMMDD')
+                                        || endtime
+                                        /*|| ':00'*/,
+                                        'YYYYMMDDHH24:mi:ss'
+                                       )
+                       WHEN TO_CHAR (SYSDATE, 'HH24') >= '12'
+                       AND SUBSTR (endtime, 1, 2) < '12'
+                          THEN TO_DATE (   TO_CHAR (SYSDATE + 1, 'YYYYMMDD')
+                                        || endtime
+                                        /*|| ':00'*/,
+                                        'YYYYMMDDHH24:mi:ss'
+                                       )
+                       WHEN TO_DATE (   TO_CHAR (SYSDATE, 'YYYYMMDD')
+                                     || starttime
+                                     /*|| ':00'*/,
+                                     'YYYYMMDDHH24:mi:ss'
+                                    ) <
+                              TO_DATE (   TO_CHAR (SYSDATE, 'YYYYMMDD')
+                                       || endtime
+                                       /*|| ':00'*/,
+                                       'YYYYMMDDHH24:mi:ss'
+                                      )
+                       AND TO_CHAR (SUBSTR (starttime, 1, 2)) > '12'
+                       AND TO_CHAR (SYSDATE, 'HH24') < '12'
+                          THEN TO_DATE (   TO_CHAR (SYSDATE - 1, 'YYYYMMDD')
+                                        || endtime
+                                        /*|| ':00'*/,
+                                        'YYYYMMDDHH24:mi:ss'
+                                       )
+                       ELSE TO_DATE (   TO_CHAR (SYSDATE, 'YYYYMMDD')
+                                     || endtime
+                                     /*|| ':00'*/,
+                                     'YYYYMMDDHH24:mi:ss'
+                                    )
+                    END
+             ELSE TO_DATE (TO_CHAR (SYSDATE, 'YYYYMMDD') || endtime /*|| ':00'*/,
+                           'YYYYMMDDHH24:mi:ss'
+                          )
+          END AS endtime,
+          breaktime, intarget, outtarget, inactual, outactual
+          ,updatetime
+     FROM ppfprodperiod;

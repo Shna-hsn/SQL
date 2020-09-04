@@ -1,0 +1,89 @@
+CREATE OR REPLACE TRIGGER TRI_KBLINEINFOTOEAI
+AFTER INSERT OR UPDATE OR DELETE ON SFCPP139.SFCLINE_MAP
+REFERENCING OLD AS OLD NEW AS NEW
+   FOR EACH ROW
+DECLARE
+  V_PLANT LINEKBDETAIL.PLANT%TYPE := 'P8-F139';
+  Incount NUMBER := 0;
+BEGIN
+  IF INSERTING OR UPDATING THEN
+    SELECT COUNT(*)
+      INTO Incount
+      FROM TIBCOEAI.WKSKBLINEINFO
+     WHERE PLANT = V_PLANT
+       AND PROCESS = :NEW.PROCESS
+       AND LINE = :NEW.LINE;
+    IF Incount <= 0 THEN
+      INSERT INTO TIBCOEAI.WKSKBLINEINFO
+        (PLANT,
+         MFGTYPE,
+         PROCESS,
+         LINE,
+         SMTLINES,
+         DIPLINES,
+         BYCYC,
+         UNITPER,
+         INSTAGE,
+         OUTSTAGE,
+         FPYRSTAGE,
+         BREAKTIMEPER,
+         REDO,
+         UPDATEDATE,
+         HALFLINE,
+         BALANCE,
+         USERID,
+         PDPLANT)
+      VALUES
+        (V_PLANT,
+         :NEW.MFGTYPE,
+         :NEW.PROCESS,
+         :NEW.LINE,
+         :NEW.SMTLINES,
+         :NEW.DIPLINES,
+         :NEW.BYCYC,
+         :NEW.UNITPER,
+         :NEW.INSTAGE,
+         :NEW.OUTSTAGE,
+         :NEW.FPYRSTAGE,
+         :NEW.BREAKTIMEPER,
+         :NEW.REDO,
+         :NEW.UPDATEDATE,
+         :NEW.HALFLINE,
+         :NEW.BALANCE,
+         :NEW.USERID,
+         :NEW.PDPLANT);
+    ELSE
+      UPDATE TIBCOEAI.WKSKBLINEINFO
+         SET PLANT        = V_PLANT,
+             MFGTYPE      = :NEW.MFGTYPE,
+             PROCESS      = :NEW.PROCESS,
+             LINE         = :NEW.LINE,
+             SMTLINES     = :NEW.SMTLINES,
+             DIPLINES     = :NEW.DIPLINES,
+             BYCYC        = :NEW.BYCYC,
+             UNITPER      = :NEW.UNITPER,
+             INSTAGE      = :NEW.INSTAGE,
+             OUTSTAGE     = :NEW.OUTSTAGE,
+             FPYRSTAGE    = :NEW.FPYRSTAGE,
+             BREAKTIMEPER = :NEW.BREAKTIMEPER,
+             REDO         = :NEW.REDO,
+             UPDATEDATE   = :NEW.UPDATEDATE,
+             HALFLINE     = :NEW.HALFLINE,
+             BALANCE      = :NEW.BALANCE,
+             USERID       = :NEW.USERID,
+             PDPLANT      = :NEW.PDPLANT;
+    END IF;
+  END IF;
+  --DELETE
+  IF DELETING THEN
+    DELETE FROM TIBCOEAI.WKSKBLINEINFO
+     WHERE PLANT = V_PLANT
+       AND PROCESS = :NEW.PROCESS
+       AND LINE = :NEW.LINE;
+  END IF;
+
+  COMMIT;
+EXCEPTION
+  WHEN OTHERS THEN
+    RETURN;
+END;

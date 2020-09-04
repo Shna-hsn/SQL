@@ -1,0 +1,50 @@
+-- Create table
+create table WKSKBPPFPRODPERIOD
+(
+  plant      VARCHAR2(30) not null,
+  process    NUMBER(1) not null,
+  line       VARCHAR2(10) not null,
+  shift      NUMBER(1) not null,
+  periodno   NUMBER(3) not null,
+  starttime  VARCHAR2(10),
+  endtime    VARCHAR2(10),
+  breaktime  VARCHAR2(5),
+  userid     VARCHAR2(50),
+  trndate    DATE default SYSDATE not null,
+  intarget   NUMBER default 0,
+  outtarget  NUMBER default 0,
+  inactual   NUMBER default 0,
+  outactual  NUMBER default 0,
+  updatetime DATE
+)
+tablespace TIBCOEAID
+  pctfree 10
+  initrans 1
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
+-- Add comments to the columns 
+comment on column WKSKBPPFPRODPERIOD.updatetime
+  is '生產設備效率看板所用';
+-- Create/Recreate primary, unique and foreign key constraints 
+alter table WKSKBPPFPRODPERIOD
+  add constraint WKSKBPPFPRODPERIOD_PK primary key (PLANT, PROCESS, LINE, SHIFT, PERIODNO)
+  using index 
+  tablespace TIBCOEAID
+  pctfree 10
+  initrans 2
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
+-- Grant/Revoke object privileges 
+grant select on WKSKBPPFPRODPERIOD to PUBLIC;

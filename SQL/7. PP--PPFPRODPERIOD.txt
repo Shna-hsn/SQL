@@ -1,0 +1,63 @@
+-- Create table
+create table PPFPRODPERIOD
+(
+  process        NUMBER(1) not null,
+  line           VARCHAR2(10) not null,
+  shift          NUMBER(1) not null,
+  periodno       NUMBER(3) not null,
+  starttime      VARCHAR2(10),
+  endtime        VARCHAR2(10),
+  breaktime      VARCHAR2(5),
+  userid         VARCHAR2(50),
+  trndate        DATE default SYSDATE not null,
+  intarget       NUMBER default 0,
+  outtarget      NUMBER default 0,
+  inactual       NUMBER default 0,
+  outactual      NUMBER default 0,
+  updatetime     DATE default sysdate,
+  breakstarttime VARCHAR2(10),
+  breakendtime   VARCHAR2(10)
+)
+tablespace SFCPP139D
+  pctfree 10
+  initrans 1
+  maxtrans 255
+  storage
+  (
+    initial 128K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
+-- Add comments to the columns 
+comment on column PPFPRODPERIOD.shift
+  is '0為白班，1為夜班';
+comment on column PPFPRODPERIOD.periodno
+  is '節點數';
+comment on column PPFPRODPERIOD.intarget
+  is '前段投入目標';
+comment on column PPFPRODPERIOD.outtarget
+  is '產出目標';
+comment on column PPFPRODPERIOD.inactual
+  is '前段投入實際';
+comment on column PPFPRODPERIOD.outactual
+  is '產出實際';
+comment on column PPFPRODPERIOD.updatetime
+  is '設備效率看板，統計生產工時所用';
+-- Create/Recreate primary, unique and foreign key constraints 
+alter table PPFPRODPERIOD
+  add constraint PK_PPFPRODPERIOD primary key (PROCESS, LINE, SHIFT, PERIODNO)
+  using index 
+  tablespace SFCPP139D
+  pctfree 10
+  initrans 2
+  maxtrans 255
+  storage
+  (
+    initial 128K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
+-- Grant/Revoke object privileges 
+grant select on PPFPRODPERIOD to PUBLIC;

@@ -1,0 +1,39 @@
+-- Create table
+create table PPFSTANDARDPROD
+(
+  process       NUMBER(1) not null,
+  modelfamily   VARCHAR2(20 BYTE) not null,
+  modelname     VARCHAR2(20 BYTE) not null,
+  userid        VARCHAR2(50 BYTE) not null,
+  trndate       DATE not null,
+  materialgroup VARCHAR2(1 BYTE),
+  line          VARCHAR2(5 BYTE),
+  outtarget     NUMBER(8) default 0,
+  target        NUMBER(11,3) not null
+)
+tablespace SFCPP138D
+  pctfree 10
+  initrans 1
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
+-- Create/Recreate indexes 
+create index IDX_PPFSTANDARDPROD01 on PPFSTANDARDPROD (PROCESS, MODELFAMILY, MATERIALGROUP)
+  tablespace SFCPP138X
+  pctfree 10
+  initrans 2
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
+-- Grant/Revoke object privileges 
+grant select on PPFSTANDARDPROD to public;

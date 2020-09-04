@@ -1,0 +1,18 @@
+-- Create table
+create table FPYRGROUPING
+(
+  plant      VARCHAR2(50),
+  mfgtype    VARCHAR2(3),
+  stagegroup VARCHAR2(100)
+)
+tablespace SFCPP139D
+  pctfree 10
+  initrans 1
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );

@@ -1,0 +1,42 @@
+-- Create table
+create table KBUPDATEFLAG
+(
+  plant      VARCHAR2(50 BYTE) not null,
+  mfgtype    VARCHAR2(3 BYTE) not null,
+  line       VARCHAR2(5 BYTE) not null,
+  shift      VARCHAR2(5 BYTE) default 0 not null,
+  updateflag VARCHAR2(5 BYTE) default 0,
+  updatedate DATE
+)
+tablespace SFCPP139D
+  pctfree 10
+  initrans 1
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
+-- Add comments to the table 
+comment on table KBUPDATEFLAG
+  is '看板產能是否要回算上個班別的看板基本資料';
+-- Add comments to the columns 
+comment on column KBUPDATEFLAG.updateflag
+  is '0:是否回算';
+-- Create/Recreate primary, unique and foreign key constraints 
+alter table KBUPDATEFLAG
+  add constraint KBUPDATEFLAG_PK primary key (PLANT, MFGTYPE, LINE, SHIFT)
+  using index 
+  tablespace SFCPP139D
+  pctfree 10
+  initrans 2
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
